@@ -24,6 +24,9 @@
 		  	<br>
 		  	<input type="submit" name="submitAuth" value="Submit">
         </form>
+        <c:if test="${invalidCreds}">
+        	<h3>Invalid username and password, please try again.</h3>
+        </c:if>
     </body>
 </html>
 

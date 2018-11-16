@@ -7,14 +7,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.vantiq.client.BaseResponseHandler;
 import io.vantiq.client.Vantiq;
-import io.vantiq.client.VantiqError;
-import okhttp3.Response;
+import io.vantiq.client.VantiqResponse;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.google.gson.Gson;
 
 /**
  * Servlet implementation class ReportSummaryServlet
@@ -55,33 +56,65 @@ public class ProntoClientServlet extends HttpServlet {
         boolean submitAuth = request.getParameter(PARAM_SUBMIT_AUTH) != null;
         
         // Try to authenticate with VANTIQ if values are submitted
-        if(submitPass) {
+        if (submitPass) {
             String username = request.getParameter(PARAM_USERNAME);
             String password = request.getParameter(PARAM_PASSWORD);
             
             // Using VANTIQ SDK to authenticate
-            vantiq.authenticate(username, password, new BaseResponseHandler() {
+            VantiqResponse vantiqResponse = vantiq.authenticate(username, password);
+            if (vantiqResponse.isSuccess()) {                
+                // Selecting all of the managers for given user
+                // Create object to be used as filter for VANTIQ SDK Select
+                HashMap<String,String> selectFilter = new HashMap<String,String>();
+                selectFilter.put("ars_properties.manager", "true");
+                VantiqResponse managerResponse = vantiq.select("system.nodes", null, selectFilter, null);
                 
-                @Override public void onSuccess(Object body, Response response) {
-                    super.onSuccess(body, response);
-                    System.out.println("Password worked!");
+                // Get list of the managers with their meta data
+                ArrayList managerResponseBody = (ArrayList) managerResponse.getBody();
+                
+                
+                // Iterating through the JSON representation for manager meta data, converting to map,
+                // and storing in an ArrayList. Also storing names to display in catalogs.jsp
+                ArrayList<Map> managersData = new ArrayList<Map>();
+                ArrayList<String> managerNames = new ArrayList<String>();
+                Gson gson = new Gson();
+                for (int i = 0; i < managerResponseBody.size(); i++) {
+                    Map<String,Object> managerMap = new HashMap<String,Object>();
+                    String responseBodyString = managerResponseBody.get(i).toString();
+                    managerMap = (Map<String,Object>) gson.fromJson(responseBodyString, managerMap.getClass());
+                    managersData.add(managerMap);
+                    managerNames.add(managerMap.get("name").toString());
                 }
+                managerNames.add("testName");
+                managerNames.add("another");
+                managerNames.add("namir");
+                managerNames.add("fawaz");
                 
-                @Override public void onError(List<VantiqError> errors, Response response) {
-                    super.onError(errors, response);
-                    System.out.println("Errors: " + errors);
-                }
                 
-            });
+                // Display the appropriate view
+                request.setAttribute("managerData", managerNames);
+                RequestDispatcher view = request.getRequestDispatcher("catalogs.jsp");
+                view.forward(request, response);
+            } else {              
+                // Display the appropriate view
+                request.setAttribute("invalidCreds", true);
+                RequestDispatcher view = request.getRequestDispatcher("index.jsp");
+                view.forward(request, response);
+            }
         } else if (submitAuth) {
             String authToken = request.getParameter(PARAM_AUTHTOKEN);
             
             // Using VANTIQ SDK to authenticate
             vantiq.setAccessToken(authToken);
+            
+            // Display the appropriate view
+            RequestDispatcher view = request.getRequestDispatcher("catalogs.jsp");
+            view.forward(request, response);
+        } else {
+            // Display the appropriate view
+            RequestDispatcher view = request.getRequestDispatcher("index.jsp");
+            view.forward(request, response);
         }
-        
-        RequestDispatcher view = request.getRequestDispatcher("index.jsp");
-        view.forward(request, response);
     }
 
     /**
