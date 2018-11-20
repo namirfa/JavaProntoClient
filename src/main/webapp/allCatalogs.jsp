@@ -20,6 +20,7 @@
 		        		<td>
 			        		<form>
 			        			<input type="submit" name="viewCatalog" value="View Catalog">
+			        			<input type="hidden" name="catalogName" value="${data}">
 			        		</form>
 		        		</td>
 		        	</tr>
