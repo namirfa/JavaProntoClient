@@ -40,6 +40,7 @@ public class ProntoClientServlet extends HttpServlet {
     private static final String PARAM_PUBLISH_ID    = "publishID";
     private static final String PARAM_EXECUTE_PUBLISH  = "formFilled";
     private static final String PARAM_PUBLISH_FORM  = "publishForm";
+    private static final String PARAM_EVENT_NAME    = "eventName";
     
     // Final vars for VANTIQ SDK
     private static final String VANTIQ_SERVER = "http://localhost:8080";
@@ -61,16 +62,19 @@ public class ProntoClientServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
         // Check if any submit button is pressed
-        boolean submitPass = request.getParameter(PARAM_SUBMIT_PASS) != null;
-        boolean submitAuth = request.getParameter(PARAM_SUBMIT_AUTH) != null;
-        boolean viewCatalog = request.getParameter(PARAM_VIEW_CATALOG) != null;
-        boolean viewLive = request.getParameter(PARAM_VIEW_LIVE) != null;
-        boolean publish = request.getParameter(PARAM_PUBLISH) != null;
-        boolean executePublish = request.getParameter(PARAM_EXECUTE_PUBLISH) != null;
-        String catalogName = request.getParameter(PARAM_CATALOG_NAME);
-        String eventPath = request.getParameter(PARAM_EVENT_PATH);
-        String publishID = request.getParameter(PARAM_PUBLISH_ID);
-        String publishForm = request.getParameter(PARAM_PUBLISH_FORM);
+        boolean submitPass      = request.getParameter(PARAM_SUBMIT_PASS)       != null;
+        boolean submitAuth      = request.getParameter(PARAM_SUBMIT_AUTH)       != null;
+        boolean viewCatalog     = request.getParameter(PARAM_VIEW_CATALOG)      != null;
+        boolean viewLive        = request.getParameter(PARAM_VIEW_LIVE)         != null;
+        boolean publish         = request.getParameter(PARAM_PUBLISH)           != null;
+        boolean executePublish  = request.getParameter(PARAM_EXECUTE_PUBLISH)   != null;
+        
+        // Retrieving all relevant data from views
+        String catalogName      = request.getParameter(PARAM_CATALOG_NAME);
+        String eventPath        = request.getParameter(PARAM_EVENT_PATH);
+        String publishID        = request.getParameter(PARAM_PUBLISH_ID);
+        String publishForm      = request.getParameter(PARAM_PUBLISH_FORM);
+        String eventName        = request.getParameter(PARAM_EVENT_NAME);
         
         // Try to authenticate with VANTIQ if username/password are submitted
         if (submitPass) {
@@ -207,6 +211,12 @@ public class ProntoClientServlet extends HttpServlet {
             // Subscribing to live events, (first unsubscribe, then subscribe)
             vantiq.unsubscribeAll();
             vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), eventPath, null, new SubscriptionOutputCallback());
+            
+            // Displays the live events as they appear
+            request.setAttribute("eventName", eventName);
+            request.setAttribute("catalogName", catalogName);
+            RequestDispatcher view = request.getRequestDispatcher("liveView.jsp");
+            view.forward(request, response);
         } else {
             // Display the appropriate view
             RequestDispatcher view = request.getRequestDispatcher("index.jsp");

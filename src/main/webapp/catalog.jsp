@@ -36,6 +36,8 @@
 			        			<form>
 			        				<input type="submit" name="viewLive" value="View Live Events">
 				        			<input type="hidden" name="eventPath" value="${data.get("subscriber").getAsString()}">
+				        			<input type="hidden" name="catalogName" value="${catalogName}">
+				        			<input type="hidden" name="eventName" value="${data.get("name").getAsString()}">
 			        			</form>
 			        		</c:if>
 		        		</td>
