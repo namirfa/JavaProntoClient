@@ -76,9 +76,10 @@ public class ProntoClientServlet extends HttpServlet {
         String publishForm      = request.getParameter(PARAM_PUBLISH_FORM);
         String eventName        = request.getParameter(PARAM_EVENT_NAME);
         
-        // Try to authenticate with VANTIQ if username/password are submitted
+        // Beginning of if/else clauses for each submit button
+        
+        // Login button pressed - Using VANTIQ SDK to authenticate with username/password
         if (submitPass) {
-            // Using VANTIQ SDK to authenticate
             String username = request.getParameter(PARAM_USERNAME);
             String password = request.getParameter(PARAM_PASSWORD);
             VantiqResponse vantiqResponse = vantiq.authenticate(username, password);
@@ -110,8 +111,9 @@ public class ProntoClientServlet extends HttpServlet {
                 RequestDispatcher view = request.getRequestDispatcher("index.jsp");
                 view.forward(request, response);
             }
+            
+        // Login button pressed - Using VANTIQ SDK to authenticate with access token
         } else if (submitAuth) {
-            // Using VANTIQ SDK to authenticate with access token
             String authToken = request.getParameter(PARAM_AUTHTOKEN);
             vantiq.setAccessToken(authToken);
             
@@ -135,8 +137,10 @@ public class ProntoClientServlet extends HttpServlet {
             request.setAttribute("managerData", managerNames);
             RequestDispatcher view = request.getRequestDispatcher("allCatalogs.jsp");
             view.forward(request, response);
+            
+        // View Catalog button pressed - Displaying all the events for a given catalog
         } else if (viewCatalog) {
-            // Displaying all the events for a given catalog
+            
             HashMap<String,String> catalogFilter = new HashMap<String,String>();
             catalogFilter.put("managerNode", catalogName);
             VantiqResponse catalogResponse = vantiq.execute("Broker.getAllEvents", catalogFilter);
@@ -174,14 +178,16 @@ public class ProntoClientServlet extends HttpServlet {
             request.setAttribute("catalogData", catalogArrayList);
             RequestDispatcher view = request.getRequestDispatcher("catalog.jsp");
             view.forward(request, response);
+            
+        // Publish button pressed - Displays form used to get payload for VANTIQ Publish
         } else if (publish) {
-            // Displays form used to get payload for VANTIQ Publish
             request.setAttribute("catalogName", catalogName);
             request.setAttribute("publishID", publishID);
             RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
             view.forward(request, response);
+        
+        // Submit Publish button pressed - Publishes to VANTIQ using the data from the Publish Form as the payload
         } else if (executePublish) {
-            // Publishes to VANTIQ using the data from the Publish Form as the payload
             JsonObject payload = new JsonObject();
             try {
                 payload = gson.fromJson(publishForm, JsonObject.class);
@@ -207,8 +213,9 @@ public class ProntoClientServlet extends HttpServlet {
                 RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
                 view.forward(request, response);
             }
+            
+        // View Live button pressed - Subscribing to live events, (first unsubscribe, then subscribe)
         } else if (viewLive) {
-            // Subscribing to live events, (first unsubscribe, then subscribe)
             vantiq.unsubscribeAll();
             vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), eventPath, null, new SubscriptionOutputCallback());
             
@@ -217,8 +224,9 @@ public class ProntoClientServlet extends HttpServlet {
             request.setAttribute("catalogName", catalogName);
             RequestDispatcher view = request.getRequestDispatcher("liveView.jsp");
             view.forward(request, response);
+            
+        // Default case - display the login page
         } else {
-            // Display the appropriate view
             RequestDispatcher view = request.getRequestDispatcher("index.jsp");
             view.forward(request, response);
         }
