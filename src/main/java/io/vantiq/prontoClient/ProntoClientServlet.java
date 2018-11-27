@@ -16,6 +16,7 @@ import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.JsonArray;
 
 /**
@@ -25,7 +26,7 @@ import com.google.gson.JsonArray;
 public class ProntoClientServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    // Parameter strings from index.jsp file
+    // Parameter strings from all .jsp files
     private static final String PARAM_SUBMIT_PASS   = "submitPass";
     private static final String PARAM_SUBMIT_AUTH   = "submitAuth";
     private static final String PARAM_USERNAME      = "username";
@@ -35,6 +36,10 @@ public class ProntoClientServlet extends HttpServlet {
     private static final String PARAM_CATALOG_NAME  = "catalogName";
     private static final String PARAM_VIEW_LIVE     = "viewLive";
     private static final String PARAM_EVENT_PATH    = "eventPath";
+    private static final String PARAM_PUBLISH       = "publish";
+    private static final String PARAM_PUBLISH_ID    = "publishID";
+    private static final String PARAM_EXECUTE_PUBLISH  = "formFilled";
+    private static final String PARAM_PUBLISH_FORM  = "publishForm";
     
     // Final vars for VANTIQ SDK
     private static final String VANTIQ_SERVER = "http://localhost:8080";
@@ -60,8 +65,12 @@ public class ProntoClientServlet extends HttpServlet {
         boolean submitAuth = request.getParameter(PARAM_SUBMIT_AUTH) != null;
         boolean viewCatalog = request.getParameter(PARAM_VIEW_CATALOG) != null;
         boolean viewLive = request.getParameter(PARAM_VIEW_LIVE) != null;
+        boolean publish = request.getParameter(PARAM_PUBLISH) != null;
+        boolean executePublish = request.getParameter(PARAM_EXECUTE_PUBLISH) != null;
         String catalogName = request.getParameter(PARAM_CATALOG_NAME);
         String eventPath = request.getParameter(PARAM_EVENT_PATH);
+        String publishID = request.getParameter(PARAM_PUBLISH_ID);
+        String publishForm = request.getParameter(PARAM_PUBLISH_FORM);
         
         // Try to authenticate with VANTIQ if username/password are submitted
         if (submitPass) {
@@ -161,6 +170,39 @@ public class ProntoClientServlet extends HttpServlet {
             request.setAttribute("catalogData", catalogArrayList);
             RequestDispatcher view = request.getRequestDispatcher("catalog.jsp");
             view.forward(request, response);
+        } else if (publish) {
+            // Displays form used to get payload for VANTIQ Publish
+            request.setAttribute("catalogName", catalogName);
+            request.setAttribute("publishID", publishID);
+            RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
+            view.forward(request, response);
+        } else if (executePublish) {
+            // Publishes to VANTIQ using the data from the Publish Form as the payload
+            JsonObject payload = new JsonObject();
+            try {
+                payload = gson.fromJson(publishForm, JsonObject.class);
+                String topicID = publishID.replaceFirst("^/topics", "");
+                VantiqResponse publishResponse = vantiq.publish(Vantiq.SystemResources.TOPICS.value(), topicID, payload);
+                
+                // Setting appropriate attribute depending on if publish is successful
+                if (publishResponse.isSuccess()) {
+                    request.setAttribute("success", true);
+                } else {
+                    request.setAttribute("fail", true);
+                }
+                // Displays form used to get payload for VANTIQ Publish
+                request.setAttribute("catalogName", catalogName);
+                request.setAttribute("publishID", publishID);
+                RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
+                view.forward(request, response);
+            } catch (JsonSyntaxException e) {
+                // Displays form used to get payload for VANTIQ Publish, including invalid JSON error
+                request.setAttribute("invalidJSON", true);
+                request.setAttribute("catalogName", catalogName);
+                request.setAttribute("publishID", publishID);
+                RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
+                view.forward(request, response);
+            }
         } else if (viewLive) {
             // Subscribing to live events, (first unsubscribe, then subscribe)
             vantiq.unsubscribeAll();

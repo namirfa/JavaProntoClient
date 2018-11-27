@@ -25,10 +25,19 @@
 		        		<td>${data.get("subscriber").getAsString()}</td>
 		        		<td>${data.get("publisher").getAsString()}</td>
 		        		<td>
-		        			<form>
-		        				<input type="submit" name="viewLive" value="View Live Events">
-			        			<input type="hidden" name="eventPath" value="${data.get("subscriber").getAsString()}">
-		        			</form>
+		        			<c:if test="${data.get(\"publisher\").getAsString().startsWith(\"/topics/\")}">
+		        				<form>
+			        				<input type="submit" name="publish" value="Publish">
+				        			<input type="hidden" name="publishID" value="${data.get("publisher").getAsString()}">
+				        			<input type="hidden" name="catalogName" value="${catalogName}">
+		        				</form>
+		        			</c:if>
+		        			<c:if test="${data.get(\"subscriber\").getAsString() != null}">
+			        			<form>
+			        				<input type="submit" name="viewLive" value="View Live Events">
+				        			<input type="hidden" name="eventPath" value="${data.get("subscriber").getAsString()}">
+			        			</form>
+			        		</c:if>
 		        		</td>
 		        	</tr>
 	        	</c:forEach>
