@@ -39,15 +39,11 @@
 </html>
 
 <style type="text/css">
-	h1,h2,h3{
+	h1,h3{
         text-align: center;
         font-family: arial, sans-serif;
     }
     form{
     	text-align: center;
-    }
-    #textForm {
-    	height:50px;
-    	width: 100px;
     }
 </style>

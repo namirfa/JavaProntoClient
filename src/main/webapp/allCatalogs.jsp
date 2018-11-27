@@ -31,7 +31,7 @@
 </html>
 
 <style type="text/css">
-	h1,h2,h3{
+	h1,h2{
         text-align: center;
         font-family: arial, sans-serif;
     }
