@@ -4,6 +4,29 @@
 
 <!DOCTYPE html>
 <html>
+	
+	<script type="text/javascript">
+		if ('WebSocket' in window) {
+			var webSocket = new WebSocket("ws://localhost:8000/JavaProntoClient/websocket");
+	    	webSocket.onopen = function(message) {
+	    		console.log("Connected!");
+	    	}
+	    	webSocket.onmessage = function(message) {
+	    		console.log(message.data);
+	    	}
+	    	webSocket.onclose = function(message) {
+	    		console.log("Closed!");
+	    		console.log(message.code);
+	    		console.log(message.reason);
+	    	}
+	    	webSocket.onerror = function(message) {
+	    		console.log("Error!");
+	    	}	
+		} else {
+			alert("WebSocket isn't supported for this browser.")
+		}
+    </script>
+
     <title>VANTIQ LiveView</title>
     <body>
     	<h1>Live feed of events on ${eventName}</h1>
