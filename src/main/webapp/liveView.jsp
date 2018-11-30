@@ -7,7 +7,7 @@
     <title>VANTIQ LiveView</title>
     <body>
     	<h1>Live feed of events on ${eventName}</h1>
-    	<form>
+    	<form action="${pageContext.request.contextPath}/Catalog" method="post">
    			<input type="submit" name="viewCatalog" value="Return to Catalog">
    			<input type="hidden" name="catalogName" value="${catalogName}">
     	</form>

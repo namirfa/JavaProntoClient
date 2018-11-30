@@ -16,13 +16,11 @@ import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.JsonArray;
 
 /**
  * Servlet implementation class ProntoClientServlet
  */
-@WebServlet("/ProntoClientServlet")
+@WebServlet("/AllCatalogs")
 public class ProntoClientServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -32,21 +30,12 @@ public class ProntoClientServlet extends HttpServlet {
     private static final String PARAM_USERNAME      = "username";
     private static final String PARAM_PASSWORD      = "password";
     private static final String PARAM_AUTHTOKEN     = "authToken";
-    private static final String PARAM_VIEW_CATALOG  = "viewCatalog";
-    private static final String PARAM_CATALOG_NAME  = "catalogName";
-    private static final String PARAM_VIEW_LIVE     = "viewLive";
-    private static final String PARAM_EVENT_PATH    = "eventPath";
-    private static final String PARAM_PUBLISH       = "publish";
-    private static final String PARAM_PUBLISH_ID    = "publishID";
-    private static final String PARAM_EXECUTE_PUBLISH  = "formFilled";
-    private static final String PARAM_PUBLISH_FORM  = "publishForm";
-    private static final String PARAM_EVENT_NAME    = "eventName";
     
     // Final vars for VANTIQ SDK
     private static final String VANTIQ_SERVER = "http://localhost:8080";
     
     // Global vars
-    Vantiq vantiq;
+    public static Vantiq vantiq;
     Gson gson = new Gson();
 
     /**
@@ -64,20 +53,7 @@ public class ProntoClientServlet extends HttpServlet {
         // Check if any submit button is pressed
         boolean submitPass      = request.getParameter(PARAM_SUBMIT_PASS)       != null;
         boolean submitAuth      = request.getParameter(PARAM_SUBMIT_AUTH)       != null;
-        boolean viewCatalog     = request.getParameter(PARAM_VIEW_CATALOG)      != null;
-        boolean viewLive        = request.getParameter(PARAM_VIEW_LIVE)         != null;
-        boolean publish         = request.getParameter(PARAM_PUBLISH)           != null;
-        boolean executePublish  = request.getParameter(PARAM_EXECUTE_PUBLISH)   != null;
-        
-        // Retrieving all relevant data from views
-        String catalogName      = request.getParameter(PARAM_CATALOG_NAME);
-        String eventPath        = request.getParameter(PARAM_EVENT_PATH);
-        String publishID        = request.getParameter(PARAM_PUBLISH_ID);
-        String publishForm      = request.getParameter(PARAM_PUBLISH_FORM);
-        String eventName        = request.getParameter(PARAM_EVENT_NAME);
-        
-        // Beginning of if/else clauses for each submit button
-        
+                
         // Login button pressed - Using VANTIQ SDK to authenticate with username/password
         if (submitPass) {
             String username = request.getParameter(PARAM_USERNAME);
@@ -136,98 +112,6 @@ public class ProntoClientServlet extends HttpServlet {
             // Display the appropriate view
             request.setAttribute("managerData", managerNames);
             RequestDispatcher view = request.getRequestDispatcher("allCatalogs.jsp");
-            view.forward(request, response);
-            
-        // View Catalog button pressed - Displaying all the events for a given catalog
-        } else if (viewCatalog) {
-            
-            HashMap<String,String> catalogFilter = new HashMap<String,String>();
-            catalogFilter.put("managerNode", catalogName);
-            VantiqResponse catalogResponse = vantiq.execute("Broker.getAllEvents", catalogFilter);
-            JsonArray catalogArray = (JsonArray) catalogResponse.getBody();
-            
-            // Getting the list of subscribers/publishers for the given namespace
-            VantiqResponse subscriberResponse = vantiq.select("ArsEventSubscriber", null, null, null);
-            VantiqResponse publisherResponse = vantiq.select("ArsEventPublisher", null, null, null);
-            ArrayList<JsonObject> subscriberArray = (ArrayList<JsonObject>) subscriberResponse.getBody();
-            ArrayList<JsonObject> publisherArray = (ArrayList<JsonObject>) publisherResponse.getBody();
-            
-            // Iterate over JsonArray and store in ArrayList (.jsp file can't iterate over JsonArray)
-            ArrayList<JsonObject> catalogArrayList = new ArrayList<JsonObject>();
-            for (int i = 0; i < catalogArray.size(); i++) {
-                JsonObject elem = catalogArray.get(i).getAsJsonObject();
-                
-                // Merge subscriber information to event types
-                for (int j = 0; j < subscriberArray.size(); j++) {
-                    if (subscriberArray.get(j).get("name").getAsString().equals(elem.get("name").getAsString())) {
-                        elem.addProperty("subscriber", subscriberArray.get(j).get("localName").getAsString());
-                    }
-                }
-                
-                // Merge publisher information to event types
-                for (int j = 0; j < publisherArray.size(); j++) {
-                    if (publisherArray.get(j).get("name").getAsString().equals(elem.get("name").getAsString())) {
-                        elem.addProperty("publisher", publisherArray.get(j).get("localEvent").getAsString());
-                    }
-                }                
-                catalogArrayList.add(elem);
-            }
-
-            // Display the appropriate view
-            request.setAttribute("catalogName", catalogName);
-            request.setAttribute("catalogData", catalogArrayList);
-            RequestDispatcher view = request.getRequestDispatcher("catalog.jsp");
-            view.forward(request, response);
-            
-        // Publish button pressed - Displays form used to get payload for VANTIQ Publish
-        } else if (publish) {
-            request.setAttribute("catalogName", catalogName);
-            request.setAttribute("publishID", publishID);
-            RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
-            view.forward(request, response);
-        
-        // Submit Publish button pressed - Publishes to VANTIQ using the data from the Publish Form as the payload
-        } else if (executePublish) {
-            JsonObject payload = new JsonObject();
-            try {
-                payload = gson.fromJson(publishForm, JsonObject.class);
-                String topicID = publishID.replaceFirst("^/topics", "");
-                VantiqResponse publishResponse = vantiq.publish(Vantiq.SystemResources.TOPICS.value(), topicID, payload);
-                
-                // Setting appropriate attribute depending on if publish is successful
-                if (publishResponse.isSuccess()) {
-                    request.setAttribute("success", true);
-                } else {
-                    request.setAttribute("fail", true);
-                }
-                // Displays form used to get payload for VANTIQ Publish
-                request.setAttribute("catalogName", catalogName);
-                request.setAttribute("publishID", publishID);
-                RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
-                view.forward(request, response);
-            } catch (JsonSyntaxException e) {
-                // Displays form used to get payload for VANTIQ Publish, including invalid JSON error
-                request.setAttribute("invalidJSON", true);
-                request.setAttribute("catalogName", catalogName);
-                request.setAttribute("publishID", publishID);
-                RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
-                view.forward(request, response);
-            }
-            
-        // View Live button pressed - Subscribing to live events, (first unsubscribe, then subscribe)
-        } else if (viewLive) {
-            vantiq.unsubscribeAll();
-            vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), eventPath, null, new SubscriptionOutputCallback());
-            
-            // Displays the live events as they appear
-            request.setAttribute("eventName", eventName);
-            request.setAttribute("catalogName", catalogName);
-            RequestDispatcher view = request.getRequestDispatcher("liveView.jsp");
-            view.forward(request, response);
-            
-        // Default case - display the login page
-        } else {
-            RequestDispatcher view = request.getRequestDispatcher("index.jsp");
             view.forward(request, response);
         }
     }

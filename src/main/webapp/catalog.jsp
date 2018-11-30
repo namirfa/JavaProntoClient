@@ -26,14 +26,14 @@
 		        		<td>${data.get("publisher").getAsString()}</td>
 		        		<td>
 		        			<c:if test="${data.get(\"publisher\").getAsString().startsWith(\"/topics/\")}">
-		        				<form>
+		        				<form action="${pageContext.request.contextPath}/Publish" method="post">
 			        				<input type="submit" name="publish" value="Publish">
 				        			<input type="hidden" name="publishID" value="${data.get("publisher").getAsString()}">
 				        			<input type="hidden" name="catalogName" value="${catalogName}">
 		        				</form>
 		        			</c:if>
 		        			<c:if test="${data.get(\"subscriber\").getAsString() != null}">
-			        			<form>
+			        			<form action="${pageContext.request.contextPath}/LiveView" method="post">
 			        				<input type="submit" name="viewLive" value="View Live Events">
 				        			<input type="hidden" name="eventPath" value="${data.get("subscriber").getAsString()}">
 				        			<input type="hidden" name="catalogName" value="${catalogName}">

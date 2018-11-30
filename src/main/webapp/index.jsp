@@ -8,7 +8,7 @@
     <body>
         <h1>VANTIQ Event Catalog</h1>
         <br>
-        <form action="${pageContext.request.contextPath}/ProntoClientServlet" method="get">
+        <form action="${pageContext.request.contextPath}/AllCatalogs" method="post">
      		Username:<br>
 		  	<input type="text" name="username" id="text" placeholder="username">
 		  	<br>
@@ -18,7 +18,7 @@
 		  	<input type="submit" name="submitPass" value="Submit">
         </form>
         <h2>--OR--</h2>
-        <form action="${pageContext.request.contextPath}/ProntoClientServlet" method="get">
+        <form action="${pageContext.request.contextPath}/AllCatalogs" method="post">
         	Existing Token:<br>
 		  	<input type="text" name="authToken" id="text" placeholder="auth token">
 		  	<br>

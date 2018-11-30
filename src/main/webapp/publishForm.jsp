@@ -8,7 +8,7 @@
     <body>
     	<h1>Publishing to: ${publishID}</h1>
     	<h3>Please fill out form in JSON format to publish:</h3>
-    	<form>
+    	<form action="${pageContext.request.contextPath}/Publish" method="post">
     		<textarea rows="10" cols="60" name="publishForm">
 {
 	"Key": "Value",
