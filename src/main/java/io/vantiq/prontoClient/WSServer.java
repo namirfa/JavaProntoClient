@@ -8,6 +8,11 @@ import javax.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(value="/websocket")
 public class WSServer {
+    
+    public WSServer () {
+        System.out.println("WS Constructor");
+    }
+    
     @OnOpen
     public void onOpen() {
         System.out.println("Opened!");
