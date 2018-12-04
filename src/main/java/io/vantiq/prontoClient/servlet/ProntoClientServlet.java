@@ -1,4 +1,4 @@
-package io.vantiq.prontoClient;
+package io.vantiq.prontoClient.servlet;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 public class ProntoClientServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    // Parameter strings from all .jsp files
+    // Parameter strings for index.jsp's form fields
     private static final String PARAM_SUBMIT_PASS   = "submitPass";
     private static final String PARAM_SUBMIT_AUTH   = "submitAuth";
     private static final String PARAM_USERNAME      = "username";
@@ -36,7 +36,6 @@ public class ProntoClientServlet extends HttpServlet {
     
     // Global vars
     public static HashMap<String,Vantiq> vantiqMap = new HashMap<String,Vantiq>();
-    Vantiq vantiq;
     Gson gson = new Gson();
 
     /**
@@ -44,7 +43,6 @@ public class ProntoClientServlet extends HttpServlet {
      */
     public ProntoClientServlet() {
         super();
-        vantiq = new io.vantiq.client.Vantiq(VANTIQ_SERVER);
     }
 
     /**
@@ -55,7 +53,8 @@ public class ProntoClientServlet extends HttpServlet {
         boolean submitPass = request.getParameter(PARAM_SUBMIT_PASS) != null;
         boolean submitAuth = request.getParameter(PARAM_SUBMIT_AUTH) != null;
         
-        // Save vantiq instance in vantiqMap so other servlets can access it
+        // Create and save vantiq instance in vantiqMap so other servlets can access it
+        Vantiq vantiq = new io.vantiq.client.Vantiq(VANTIQ_SERVER);
         vantiqMap.put(request.getSession().getId(), vantiq);
                 
         // Login button pressed - Using VANTIQ SDK to authenticate with username/password

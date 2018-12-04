@@ -1,4 +1,4 @@
-package io.vantiq.prontoClient;
+package io.vantiq.prontoClient.servlet;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,7 +24,7 @@ import com.google.gson.JsonSyntaxException;
 public class PublishFormServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    // Parameter strings from all .jsp files
+    // Parameter strings for catalog.jsp's form fields
     private static final String PARAM_CATALOG_NAME  = "catalogName";
     private static final String PARAM_PUBLISH_ID    = "publishID";
     private static final String PARAM_EXECUTE_PUBLISH  = "formFilled";
@@ -70,13 +70,13 @@ public class PublishFormServlet extends HttpServlet {
                 } else {
                     request.setAttribute("fail", true);
                 }
-                // Displays form used to get payload for VANTIQ Publish
+                // Displays form used to get the payload for VANTIQ Publish
                 request.setAttribute("catalogName", catalogName);
                 request.setAttribute("publishID", publishID);
                 RequestDispatcher view = request.getRequestDispatcher("publishForm.jsp");
                 view.forward(request, response);
             } catch (JsonSyntaxException e) {
-                // Displays form used to get payload for VANTIQ Publish, including invalid JSON error
+                // Displays form used to get the payload for VANTIQ Publish, including invalid JSON error
                 request.setAttribute("invalidJSON", true);
                 request.setAttribute("catalogName", catalogName);
                 request.setAttribute("publishID", publishID);

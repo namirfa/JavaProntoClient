@@ -1,4 +1,4 @@
-package io.vantiq.prontoClient;
+package io.vantiq.prontoClient.servlet;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,7 +25,7 @@ import com.google.gson.JsonArray;
 public class CatalogServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    // Parameter strings from all .jsp files
+    // Parameter string for allCatalogs.jsp's form field
     private static final String PARAM_CATALOG_NAME  = "catalogName";
     
     // Global vars
@@ -49,6 +49,7 @@ public class CatalogServlet extends HttpServlet {
         // Get vantiq instance based on session
         Vantiq vantiq = vantiqMap.get(request.getSession().getId());
             
+        // Fetching list of all known event types for a manager
         HashMap<String,String> catalogFilter = new HashMap<String,String>();
         catalogFilter.put("managerNode", catalogName);
         VantiqResponse catalogResponse = vantiq.execute("Broker.getAllEvents", catalogFilter);
