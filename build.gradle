@@ -16,6 +16,8 @@ dependencies {
   
     providedCompile "javax.servlet:javax.servlet-api:3.1.0"   
     				"javax.servlet:jsp-api:2.0"
+    				
+    compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 
     def tomcatVersion = '9.0.1'
     tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
