@@ -6,7 +6,7 @@ apply plugin: 'com.bmuschko.tomcat'
 repositories {
     jcenter()
     
-    // Used for uploading documents (images) to VANTIQ with VANTIQ SDK
+    // Used for VANTIQ SDK
     maven {
     	url "https://dl.bintray.com/vantiq/maven"
     }
