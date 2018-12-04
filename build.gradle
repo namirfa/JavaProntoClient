@@ -26,7 +26,7 @@ dependencies {
     // Used for VANTIQ SDK
 	compile 'io.vantiq:vantiq-sdk:1.0.17'
 	
-	// Test for using javax.websocket
+	// Used to setup Java WebSockets
 	compile 'javax.websocket:javax.websocket-api:1.1'
 }
 
