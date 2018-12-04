@@ -29,7 +29,7 @@ public class CatalogServlet extends HttpServlet {
     private static final String PARAM_CATALOG_NAME  = "catalogName";
     
     // Global vars
-    public static Vantiq vantiq = ProntoClientServlet.vantiq;
+    HashMap<String,Vantiq> vantiqMap = ProntoClientServlet.vantiqMap;
     Gson gson = new Gson();
 
     /**
@@ -40,12 +40,14 @@ public class CatalogServlet extends HttpServlet {
     }
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
+        // Retrieving all relevant data from view
+        String catalogName = request.getParameter(PARAM_CATALOG_NAME);
         
-        // Retrieving all relevant data from views
-        String catalogName      = request.getParameter(PARAM_CATALOG_NAME);
+        // Get vantiq instance based on session
+        Vantiq vantiq = vantiqMap.get(request.getSession().getId());
             
         HashMap<String,String> catalogFilter = new HashMap<String,String>();
         catalogFilter.put("managerNode", catalogName);
@@ -86,13 +88,4 @@ public class CatalogServlet extends HttpServlet {
         view.forward(request, response);
             
     }
-
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
-    }
-    
 }

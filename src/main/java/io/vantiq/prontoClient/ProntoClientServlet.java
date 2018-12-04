@@ -35,7 +35,8 @@ public class ProntoClientServlet extends HttpServlet {
     private static final String VANTIQ_SERVER = "http://localhost:8080";
     
     // Global vars
-    public static Vantiq vantiq;
+    public static HashMap<String,Vantiq> vantiqMap = new HashMap<String,Vantiq>();
+    Vantiq vantiq;
     Gson gson = new Gson();
 
     /**
@@ -47,12 +48,15 @@ public class ProntoClientServlet extends HttpServlet {
     }
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
         // Check if any submit button is pressed
-        boolean submitPass      = request.getParameter(PARAM_SUBMIT_PASS)       != null;
-        boolean submitAuth      = request.getParameter(PARAM_SUBMIT_AUTH)       != null;
+        boolean submitPass = request.getParameter(PARAM_SUBMIT_PASS) != null;
+        boolean submitAuth = request.getParameter(PARAM_SUBMIT_AUTH) != null;
+        
+        // Save vantiq instance in vantiqMap so other servlets can access it
+        vantiqMap.put(request.getSession().getId(), vantiq);
                 
         // Login button pressed - Using VANTIQ SDK to authenticate with username/password
         if (submitPass) {
@@ -115,13 +119,4 @@ public class ProntoClientServlet extends HttpServlet {
             view.forward(request, response);
         }
     }
-
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
-    }
-    
 }

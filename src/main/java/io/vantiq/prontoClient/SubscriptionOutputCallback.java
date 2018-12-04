@@ -1,15 +1,19 @@
 package io.vantiq.prontoClient;
 
+import java.io.IOException;
+
+import javax.websocket.Session;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+
 import io.vantiq.client.SubscriptionCallback;
 import io.vantiq.client.SubscriptionMessage;
 
 public class SubscriptionOutputCallback implements SubscriptionCallback {
     
-    public WSServer testWS;
-    
-    public SubscriptionOutputCallback() {
-        testWS = new WSServer();
-    }
+    // Websocket session used to send messages to client
+    Session wsSession;
+    Gson gson;
     
     @Override
     public void onConnect() {
@@ -17,9 +21,16 @@ public class SubscriptionOutputCallback implements SubscriptionCallback {
     }
 
     @Override
-    public void onMessage(SubscriptionMessage message) {
-        System.out.println("Received Message: " + message);
-        testWS.onMessage(message.toString());
+    public void onMessage(SubscriptionMessage message) {        
+        LinkedTreeMap<?,?> bodyTree = (LinkedTreeMap<?,?>) message.getBody();
+        
+        if (wsSession.isOpen()) {
+          try {
+              wsSession.getBasicRemote().sendText(bodyTree.get("value").toString());
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+        }
     }
 
     @Override

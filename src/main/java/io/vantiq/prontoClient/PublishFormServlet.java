@@ -11,6 +11,7 @@ import io.vantiq.client.Vantiq;
 import io.vantiq.client.VantiqResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -30,7 +31,7 @@ public class PublishFormServlet extends HttpServlet {
     private static final String PARAM_PUBLISH_FORM  = "publishForm";
     
     // Global vars
-    public static Vantiq vantiq = ProntoClientServlet.vantiq;
+    HashMap<String,Vantiq> vantiqMap = ProntoClientServlet.vantiqMap;
     Gson gson = new Gson();
 
     /**
@@ -41,16 +42,19 @@ public class PublishFormServlet extends HttpServlet {
     }
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
-        // Check if any submit button is pressed
-        boolean executePublish  = request.getParameter(PARAM_EXECUTE_PUBLISH)   != null;
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
+        // Check if submit button is pressed
+        boolean executePublish  = request.getParameter(PARAM_EXECUTE_PUBLISH) != null;
         
-        // Retrieving all relevant data from views
-        String catalogName      = request.getParameter(PARAM_CATALOG_NAME);
-        String publishID        = request.getParameter(PARAM_PUBLISH_ID);
-        String publishForm      = request.getParameter(PARAM_PUBLISH_FORM);
+        // Retrieving all relevant data from view
+        String catalogName  = request.getParameter(PARAM_CATALOG_NAME);
+        String publishID    = request.getParameter(PARAM_PUBLISH_ID);
+        String publishForm  = request.getParameter(PARAM_PUBLISH_FORM);
+        
+        // Get vantiq instance based on session
+        Vantiq vantiq = vantiqMap.get(request.getSession().getId());
         
         // Submit Publish button pressed - Publishes to VANTIQ using the data from the Publish Form as the payload
         if (executePublish) {
@@ -86,13 +90,4 @@ public class PublishFormServlet extends HttpServlet {
             view.forward(request, response);
         }
     }
-
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Auto-generated method stub
-        doGet(request, response);
-    }
-    
 }

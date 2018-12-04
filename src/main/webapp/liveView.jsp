@@ -9,18 +9,20 @@
 		if ('WebSocket' in window) {
 			var webSocket = new WebSocket("ws://localhost:8000/JavaProntoClient/websocket");
 	    	webSocket.onopen = function(message) {
-	    		console.log("Connected!");
+	    		console.log("Websocket Connected.");
 	    	}
 	    	webSocket.onmessage = function(message) {
 	    		console.log(message.data);
+	    		var ul = document.getElementById("events");
+	    		var li = document.createElement("li");
+	    		li.appendChild(document.createTextNode(message.data));
+	    		ul.appendChild(li);
 	    	}
 	    	webSocket.onclose = function(message) {
-	    		console.log("Closed!");
-	    		console.log(message.code);
-	    		console.log(message.reason);
+	    		console.log("Websocket Closed.");
 	    	}
 	    	webSocket.onerror = function(message) {
-	    		console.log("Error!");
+	    		console.log("WebSocket Error.");
 	    	}	
 		} else {
 			alert("WebSocket isn't supported for this browser.")
@@ -34,6 +36,9 @@
    			<input type="submit" name="viewCatalog" value="Return to Catalog">
    			<input type="hidden" name="catalogName" value="${catalogName}">
     	</form>
+    	<ul id="events">
+    	
+    	</ul>
     </body>
 </html>
 
@@ -44,5 +49,10 @@
     }
     form{
     	text-align: center;
+    }
+    #events{
+    	text-align: center;
+    	list-style-type: none;
+    	padding: 0px;
     }
 </style>
