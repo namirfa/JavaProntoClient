@@ -18,7 +18,7 @@
 	        		<tr>
 		        		<td>${data}</td>
 		        		<td>
-			        		<form>
+			        		<form action="${pageContext.request.contextPath}/Catalog" method="post">
 			        			<input type="submit" name="viewCatalog" value="View Catalog">
 			        			<input type="hidden" name="catalogName" value="${data}">
 			        		</form>

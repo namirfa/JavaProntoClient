@@ -8,7 +8,7 @@
     <body>
     	<h1>Publishing to: ${publishID}</h1>
     	<h3>Please fill out form in JSON format to publish:</h3>
-    	<form>
+    	<form action="${pageContext.request.contextPath}/Publish" method="post">
     		<textarea rows="10" cols="60" name="publishForm">
 {
 	"Key": "Value",
@@ -30,10 +30,13 @@
     		</c:if>
     		<table>
     			<input type="submit" name="formFilled" value="Submit Publish">
-    			<input type="submit" name="viewCatalog" value="Return to Catalog">
     			<input type="hidden" name="publishID" value="${publishID}">
     			<input type="hidden" name="catalogName" value="${catalogName}">
     		</table>
+    	</form>
+    	<form action="${pageContext.request.contextPath}/Catalog" method="post">
+ 			<input type="submit" name="viewCatalog" value="Return to Catalog">
+ 			<input type="hidden" name="catalogName" value="${catalogName}">
     	</form>
     </body>
 </html>
