@@ -11,21 +11,21 @@
         <h2>Your VANTIQ Catalogs</h2>
         <div>
             <table>
-	            <tr>
-	       		    <th>Manager Namespace</th>
-	       		    <th>Fetch Events</th>
-	            </tr>
-	            <c:forEach items="${managerData}" var="data">
-	        	    <tr>
-		            <td>${data}</td>
-		                <td>
-			                <form action="${pageContext.request.contextPath}/Catalog" method="post">
-			                    <input type="submit" name="viewCatalog" value="View Catalog">
-			                    <input type="hidden" name="catalogName" value="${data}">
-			                </form>
-		                </td>
-		            </tr>
-	            </c:forEach>
+                <tr>
+                    <th>Manager Namespace</th>
+                    <th>Fetch Events</th>
+                </tr>
+                <c:forEach items="${managerData}" var="data">
+                    <tr>
+                        <td>${data}</td>
+                        <td>
+                            <form action="${pageContext.request.contextPath}/Catalog" method="post">
+                                <input type="submit" name="viewCatalog" value="View Catalog">
+                                <input type="hidden" name="catalogName" value="${data}">
+                            </form>
+                        </td>
+                    </tr>
+                </c:forEach>
             </table>
         </div>
     </body>
