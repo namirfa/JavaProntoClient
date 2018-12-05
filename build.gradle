@@ -20,16 +20,16 @@ dependencies {
     compile group: 'javax.servlet', name: 'jstl', version: '1.2'
 
     def tomcatVersion = '9.0.1'
-    tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+   	tomcat "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
            "org.apache.tomcat.embed:tomcat-embed-logging-juli:9.0.0.M6",
            "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}",
            "org.apache.tomcat:tomcat-websocket:${tomcatVersion}"
     
     // Used for VANTIQ SDK
-    compile 'io.vantiq:vantiq-sdk:1.0.17'
+	compile 'io.vantiq:vantiq-sdk:1.0.17'
 	
-	// Used to setup Java WebSockets
-	compile 'javax.websocket:javax.websocket-api:1.1'
+    // Used to setup Java WebSockets
+    compile 'javax.websocket:javax.websocket-api:1.1'
 }
 
 tomcat {
